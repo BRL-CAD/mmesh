@@ -1,0 +1,125 @@
+name: MMESH
+
+on: [push]
+
+jobs:
+  windows_ninja:
+    name: MSVC - Ninja
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Setup - CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add github workspace to path
+        # https://github.community/t/deprecated-add-path/136621
+        run: echo "$ENV{GITHUB_WORKSPACE}" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1.3
+
+      - name: Add cl.exe to PATH
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER="cl.exe" -DCMAKE_CXX_COMPILER="cl.exe" -DCMAKE_BUILD_TYPE=Release
+          # We do the following in order to help ensure files are "flushed"
+          # to disk before compilation is attempted
+          # https://superuser.com/a/1553374/1286142
+          powershell Write-VolumeCache C
+          powershell Write-VolumeCache D
+
+      - name: Build
+        run: cd build && ninja -j1 -v
+
+  windows_std_tools:
+    name: MSVC - Standard Tools
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Setup - CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add github workspace to path
+        # https://github.community/t/deprecated-add-path/136621
+        run: echo "$ENV{GITHUB_WORKSPACE}" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -D ENABLE_ALL=ON
+          # We do the following in order to help ensure files are "flushed"
+          # to disk before compilation is attempted
+          # https://superuser.com/a/1553374/1286142
+          powershell Write-VolumeCache C
+          powershell Write-VolumeCache D
+
+          # At least for the moment, the main idea for this particular test is to try and
+          # verify multi-config building is working as expected - to shorten build times
+          # but still have a test of the key components, just build MGED
+      - name: Build
+        run: |
+          cmake --build build --config Debug   --target mged
+          cmake --build build --config Release --target mged
+
+  linux:
+    name: Ubuntu GCC
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Setup - CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
+          cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cd build && ninja -j1 -v
+
+        # For the moment the space demands are too extreme to enable this
+        # output for every compile test, but leave the enabling logic present
+        # in commented out form so it can be enabled as needed.
+#     - name: Upload Package
+#       uses: actions/upload-artifact@v2
+#       with:
+#         name: BRLCAD_Linux
+#         path: ${{ github.workspace }}/build/BRL-CAD*gz
+
+  osx:
+    name: macOS Clang
+    runs-on: macos-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Setup - CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
+          export CC=clang
+          export CXX=clang++
+          cmake -S . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
+          cd build && ninja -j1 -v
+
