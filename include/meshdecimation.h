@@ -26,6 +26,27 @@
 extern "C" {
 #endif
 
+#ifndef COMPILER_DLLEXPORT
+# if defined(_WIN32)
+#  define COMPILER_DLLEXPORT __declspec(dllexport)
+#  define COMPILER_DLLIMPORT __declspec(dllimport)
+# else
+#  define COMPILER_DLLEXPORT __attribute__ ((visibility ("default")))
+#  define COMPILER_DLLIMPORT __attribute__ ((visibility ("default")))
+# endif
+#endif
+
+#ifndef MMESH_EXPORT
+#  if defined(MMESH_DLL_EXPORTS) && defined(MMESH_DLL_IMPORTS)
+#    error "Only MMESH_DLL_EXPORTS or MMESH_DLL_IMPORTS can be defined, not both."
+#  elif defined(MMESH_DLL_EXPORTS)
+#    define MMESH_EXPORT COMPILER_DLLEXPORT
+#  elif defined(MMESH_DLL_IMPORTS)
+#    define MMESH_EXPORT COMPILER_DLLIMPORT
+#  else
+#    define MMESH_EXPORT
+#  endif
+#endif
 
 typedef struct
 {
@@ -196,45 +217,45 @@ enum
 
 
 /* Initialize mdOperation with default values */
-void mdOperationInit( mdOperation *op );
+MMESH_EXPORT void mdOperationInit( mdOperation *op );
 
 /* Set vertex and indices input data */
-void mdOperationData( mdOperation *op, size_t vertexcount, void *vertex, int vertexformat, size_t vertexstride, size_t tricount, void *indices, int indicesformat, size_t indicesstride );
+MMESH_EXPORT void mdOperationData( mdOperation *op, size_t vertexcount, void *vertex, int vertexformat, size_t vertexstride, size_t tricount, void *indices, int indicesformat, size_t indicesstride );
 
 /* Set decimation strength, feature size proportional to scale of model */
-void mdOperationStrength( mdOperation *op, double featuresize );
+MMESH_EXPORT void mdOperationStrength( mdOperation *op, double featuresize );
 
 /* Set optional boundary weight, default is 4.0 */
-void mdOperationBoundaryWeight( mdOperation *op, double boundaryweight );
+MMESH_EXPORT void mdOperationBoundaryWeight( mdOperation *op, double boundaryweight );
 
 /* Set optional per-triangle data and callback to return a edge weight between two triangles */
-void mdOperationTriData( mdOperation *op, void *tridata, size_t tridatasize, double (*edgeweight)( void *tridata0, void *tridata1 ), double (*collapsemultiplier)( void *collapsecontext, void *tridata0, void *tridata1, double *point0, double *point1 ), void *collapsecontext );
+MMESH_EXPORT void mdOperationTriData( mdOperation *op, void *tridata, size_t tridatasize, double (*edgeweight)( void *tridata0, void *tridata1 ), double (*collapsemultiplier)( void *collapsecontext, void *tridata0, void *tridata1, double *point0, double *point1 ), void *collapsecontext );
 
 /* Set optional callback to copy vertex attributes (excluding vertex position) */
-void mdOperationVertexCopy( mdOperation *op, void (*vertexcopy)( void *copycontext, int dstindex, int srcindex ), void *copycontext );
+MMESH_EXPORT void mdOperationVertexCopy( mdOperation *op, void (*vertexcopy)( void *copycontext, int dstindex, int srcindex ), void *copycontext );
 
 /* Set optional callback to blend vertex attributes (exclude vertex position) */
-void mdOperationVertexMerge( mdOperation *op, void (*vertexmerge)( void *mergecontext, int dstindex, int srcindex, double weight0, double weight1 ), void *mergecontext );
+MMESH_EXPORT void mdOperationVertexMerge( mdOperation *op, void (*vertexmerge)( void *mergecontext, int dstindex, int srcindex, double weight0, double weight1 ), void *mergecontext );
 
 /* Set optional callbacks to adjust the XYZ of potential collapse point */
-void mdOperationAdjustCollapse( mdOperation *op, int (*adjustcollapsef)( void *adjustcontext, float *collapsepoint, float *v0point, float *v1point ), int (*adjustcollapsed)( void *adjustcontext, double *collapsepoint, double *v0point, double *v1point ), void *adjustcontext );
+MMESH_EXPORT void mdOperationAdjustCollapse( mdOperation *op, int (*adjustcollapsef)( void *adjustcontext, float *collapsepoint, float *v0point, float *v1point ), int (*adjustcollapsed)( void *adjustcontext, double *collapsepoint, double *v0point, double *v1point ), void *adjustcontext );
 
 /* Set optional computation and storage of normals */
-void mdOperationComputeNormals( mdOperation *op, void *base, int format, size_t stride );
+MMESH_EXPORT void mdOperationComputeNormals( mdOperation *op, void *base, int format, size_t stride );
 
 /* Set optional callback to receive progress updates */
-void mdOperationStatusCallback( mdOperation *op, void (*statuscallback)( void *statuscontext, const mdStatus *status ), void *statuscontext, long milliseconds );
+MMESH_EXPORT void mdOperationStatusCallback( mdOperation *op, void (*statuscallback)( void *statuscontext, const mdStatus *status ), void *statuscontext, long milliseconds );
 
 /* Optional, flag vertex for locking, op->vertexcount must already be set ; op->lockmap is allocated by malloc() if null */
-void mdOperationLockVertex( mdOperation *op, long vertexindex );
+MMESH_EXPORT void mdOperationLockVertex( mdOperation *op, long vertexindex );
 
 /* Optional, free op->lockmap if allocated and set to zero */
-void mdOperationFreeLocks( mdOperation *op );
+MMESH_EXPORT void mdOperationFreeLocks( mdOperation *op );
 
 
 
 /* Decimate the mesh specified by the mdOperation struct */
-int mdMeshDecimation( mdOperation *operation, int threadcount, int flags );
+MMESH_EXPORT int mdMeshDecimation( mdOperation *operation, int threadcount, int flags );
 
 
 /* Slightly increase the quality of aggressive mesh decimations, about 50% slower (or >100% slower without SSE) */
@@ -259,13 +280,13 @@ int mdMeshDecimation( mdOperation *operation, int threadcount, int flags );
 typedef struct mdState mdState;
 
 /* Initialize state to decimate the mesh specified by the mdOperation struct */
-mdState *mdMeshDecimationInit( mdOperation *operation, int threadcount, int flags );
+MMESH_EXPORT mdState *mdMeshDecimationInit( mdOperation *operation, int threadcount, int flags );
 
 /* Perform the work for specified thread, must be called synchronously for all threadcount (they wait for each other) */
-void mdMeshDecimationThread( mdState *state, int threadindex );
+MMESH_EXPORT void mdMeshDecimationThread( mdState *state, int threadindex );
 
 /* Wait until the work has completed */
-void mdMeshDecimationEnd( mdState *state );
+MMESH_EXPORT void mdMeshDecimationEnd( mdState *state );
 
 
 #ifdef __cplusplus
