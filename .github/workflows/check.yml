@@ -55,20 +55,17 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -S . -B build -D ENABLE_ALL=ON
+          cmake -S . -B build
           # We do the following in order to help ensure files are "flushed"
           # to disk before compilation is attempted
           # https://superuser.com/a/1553374/1286142
           powershell Write-VolumeCache C
           powershell Write-VolumeCache D
 
-          # At least for the moment, the main idea for this particular test is to try and
-          # verify multi-config building is working as expected - to shorten build times
-          # but still have a test of the key components, just build MGED
       - name: Build
         run: |
-          cmake --build build --config Debug   --target mged
-          cmake --build build --config Release --target mged
+          cmake --build build --config Debug
+          cmake --build build --config Release
 
   linux:
     name: Ubuntu GCC
@@ -85,19 +82,10 @@ jobs:
       - name: Configure
         run: |
           export PATH=$ENV{GITHUB_WORKSPACE}:$PATH
-          cmake -S . -G Ninja -B build -D ENABLE_ALL=ON -D CMAKE_BUILD_TYPE=Release
+          cmake -S . -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: cd build && ninja -j1 -v
-
-        # For the moment the space demands are too extreme to enable this
-        # output for every compile test, but leave the enabling logic present
-        # in commented out form so it can be enabled as needed.
-#     - name: Upload Package
-#       uses: actions/upload-artifact@v2
-#       with:
-#         name: BRLCAD_Linux
-#         path: ${{ github.workspace }}/build/BRL-CAD*gz
 
   osx:
     name: macOS Clang
