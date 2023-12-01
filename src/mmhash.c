@@ -2307,7 +2307,8 @@ double mmHashGetHealthScore( void *hashtable, const mmHashAccess *access )
   int startseqflag;
   mmHashIndex hashkey, entryhashkey;
   uint64_t totalentrycount, busysequence, startbusyseq;
-  double healthscore, accumscore, seqscore;
+  double healthscore, seqscore;
+  double accumscore = 0.0;
   size_t entrysize;
   void *entry;
   mmHashTable *table;
