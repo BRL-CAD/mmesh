@@ -212,16 +212,10 @@
 /* Investigate weird sync issue? */
 #define DEBUG_DEBUG_CHECK_SOMETHING (0)
 
-
-#if DEBUG_VERBOSE || DEBUG_VERBOSE_COLLISION || DEBUG_VERBOSE_COLLAPSE
- #if 0
-  #define MD_ERROR(s,f,...) ({fprintf(stderr,s,__VA_ARGS__);if(f) exit(1);})
- #else
-  #define MD_ERROR(s,f,...) ({fprintf(stdout,s,__VA_ARGS__);fflush(stdout);})
- #endif
-#else
- #define MD_ERROR(s,f,...) ({fprintf(stderr,s,__VA_ARGS__);})
-#endif
+/*
+#define MD_ERROR(s,f,...) ({fprintf(stderr,s,__VA_ARGS__);if(f) exit(1);})
+*/
+#define MD_ERROR(s,f,...) fprintf(stderr,s,__VA_ARGS__)
 
 
 ////
@@ -3251,7 +3245,7 @@ static mdi mdEdgeCollapseDeleteTriangle( mdMesh *mesh, mdThreadData *tdata, mdi 
     {
 #if 0
       /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
-      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
     }
   }
@@ -3269,7 +3263,7 @@ static mdi mdEdgeCollapseDeleteTriangle( mdMesh *mesh, mdThreadData *tdata, mdi 
     {
 #if 0
       /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
-      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
     }
   }
@@ -3287,7 +3281,7 @@ static mdi mdEdgeCollapseDeleteTriangle( mdMesh *mesh, mdThreadData *tdata, mdi 
     {
 #if 0
       /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
-      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
     }
   }
@@ -3353,7 +3347,7 @@ static void mdEdgeCollapseUpdateTriangle( mdMesh *mesh, mdThreadData *tdata, mdT
     {
 #if 0
       /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
-      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
     }
   }
@@ -3369,7 +3363,7 @@ static void mdEdgeCollapseUpdateTriangle( mdMesh *mesh, mdThreadData *tdata, mdT
     {
 #if 0
       /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
-      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
     }
   }
@@ -3416,7 +3410,7 @@ static void mdEdgeCollapseUpdateTriangle( mdMesh *mesh, mdThreadData *tdata, mdT
     {
 #if 0
       /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
-      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+      MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
     }
   }
@@ -3525,7 +3519,7 @@ static void mdVertexInvalidateTri( mdMesh *mesh, mdThreadData *tdata, mdi v0, md
 #if 0
   /* Shouldn't happen with a proper watertight mesh, but it can happen if edges are reused... */
   else
-    MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+    MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
 #endif
 
   return;
@@ -3671,7 +3665,7 @@ static void mdEdgeCollapsePropagateBoundary( mdMesh *mesh, mdi v0, mdi v1 )
   else
   {
     /* NOTE: Yes, this CAN happen ~ if you fully decimate a hole away, previous boundaries are just gone */
-    MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 1, __FILE__, __LINE__ );
+    MD_ERROR( "SHOULD NOT HAPPEN %s:%d\n", 0, __FILE__, __LINE__ );
   }
 #endif
 
