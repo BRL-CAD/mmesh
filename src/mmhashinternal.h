@@ -38,7 +38,7 @@
 #endif
 
 
-typedef struct
+typedef struct MM_CACHE_ALIGN
 {
 #ifdef MM_ATOMIC_SUPPORT
   /* Powerful atomic read/write lock */
@@ -49,7 +49,7 @@ typedef struct
   mtMutex mutex;
   void *owner;
 #endif
-} mmHashPage MM_CACHE_ALIGN;
+} mmHashPage;
 
 typedef struct
 {

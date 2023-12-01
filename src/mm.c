@@ -3012,6 +3012,7 @@ void *mmMmapAlloc( size_t memsize, int trymmap, int trymlock, int tryhugepages, 
     }
 #endif
 #if MM_UNIX
+/*
     if( trymlock )
     {
       mmapflags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_LOCKED;
@@ -3024,6 +3025,7 @@ void *mmMmapAlloc( size_t memsize, int trymmap, int trymlock, int tryhugepages, 
         return alloc;
       }
     }
+*/
     mmapflags = MAP_PRIVATE | MAP_ANONYMOUS;
     alloc = mmap( 0x0, memsize, PROT_READ | PROT_WRITE, mmapflags, -1, 0 );
     if( alloc != MAP_FAILED )

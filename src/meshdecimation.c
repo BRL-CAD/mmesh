@@ -294,6 +294,11 @@ typedef int32_t mdi;
  #error MD_SIZEOF_MDI must be 4 or 8
 #endif
 
+#if !defined(__GNUC__) || defined(__clang__)
+ /* "mathshewchuk.h" only supports GCC, clang doesn't support __attribute__((__optimize__(""))) syntax */
+ #undef MD_CONF_USE_SHEWCHUK_SUMMATION
+#endif
+
 #if MD_CONF_USE_SHEWCHUK_SUMMATION
  #include "mathshewchuk.h"
 #endif
@@ -312,15 +317,27 @@ typedef int32_t mdi;
  #define M_PI (3.14159265358979323846264338327)
 #endif
 
-#define MD_VectorSubStore(x,y,z) (x)[0]=(y)[0]-(z)[0];(x)[1]=(y)[1]-(z)[1];(x)[2]=(y)[2]-(z)[2]
-#define MD_VectorCrossProduct(x,y,z) ({(x)[0]=((y)[1]*(z)[2])-((y)[2]*(z)[1]);(x)[1]=((y)[2]*(z)[0])-((y)[0]*(z)[2]);(x)[2]=((y)[0]*(z)[1])-((y)[1]*(z)[0]);})
-#define MD_VectorDotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
-#define MD_VectorCopy(x,y) ({(x)[0]=(y)[0];(x)[1]=(y)[1];(x)[2]=(y)[2];})
-#define MD_VectorMulScalar(x,y) (x)[0]*=(y);(x)[1]*=(y);(x)[2]*=(y)
-#define MD_VectorNormalize(x) ({mdf _f;_f=1.0/sqrt((x)[0]*(x)[0]+(x)[1]*(x)[1]+(x)[2]*(x)[2]);(x)[0]*=_f;(x)[1]*=_f;(x)[2]*=_f;})
-#define MD_VectorZero(x) ({(x)[0]=0.0;(x)[1]=0.0;(x)[2]=0.0;})
 #define MD_VectorMagnitude(x) (mdfsqrt((x)[0]*(x)[0]+(x)[1]*(x)[1]+(x)[2]*(x)[2]))
-#define MD_VectorAddMulScalar(x,y,z) (x)[0]+=(y)[0]*(z);(x)[1]+=(y)[1]*(z);(x)[2]+=(y)[2]*(z)
+#define MD_VectorDotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
+
+#if !defined(_MSC_VER)
+ #define MD_VectorSubStore(x,y,z) ({(x)[0]=(y)[0]-(z)[0];(x)[1]=(y)[1]-(z)[1];(x)[2]=(y)[2]-(z)[2];})
+ #define MD_VectorMulScalar(x,y) ({(x)[0]*=(y);(x)[1]*=(y);(x)[2]*=(y);})
+ #define MD_VectorAddMulScalar(x,y,z) ({(x)[0]+=(y)[0]*(z);(x)[1]+=(y)[1]*(z);(x)[2]+=(y)[2]*(z);})
+ #define MD_VectorCrossProduct(x,y,z) ({(x)[0]=((y)[1]*(z)[2])-((y)[2]*(z)[1]);(x)[1]=((y)[2]*(z)[0])-((y)[0]*(z)[2]);(x)[2]=((y)[0]*(z)[1])-((y)[1]*(z)[0]);})
+ #define MD_VectorCopy(x,y) ({(x)[0]=(y)[0];(x)[1]=(y)[1];(x)[2]=(y)[2];})
+ #define MD_VectorNormalize(x) ({mdf _f;_f=1.0/sqrt((x)[0]*(x)[0]+(x)[1]*(x)[1]+(x)[2]*(x)[2]);(x)[0]*=_f;(x)[1]*=_f;(x)[2]*=_f;})
+ #define MD_VectorZero(x) ({(x)[0]=0.0;(x)[1]=0.0;(x)[2]=0.0;})
+#else
+/* MSVC doesn't like the #define syntax */
+static inline void MD_VectorSubStore(mdf *x, mdf *y, mdf *z) {(x)[0]=(y)[0]-(z)[0];(x)[1]=(y)[1]-(z)[1];(x)[2]=(y)[2]-(z)[2];}
+static inline void MD_VectorMulScalar(mdf *x,mdf y) {(x)[0]*=(y);(x)[1]*=(y);(x)[2]*=(y);}
+static inline void MD_VectorAddMulScalar(mdf *x,mdf *y,mdf z) {(x)[0]+=(y)[0]*(z);(x)[1]+=(y)[1]*(z);(x)[2]+=(y)[2]*(z);}
+static inline void MD_VectorCrossProduct(mdf *x,mdf *y,mdf *z) {(x)[0]=((y)[1]*(z)[2])-((y)[2]*(z)[1]);(x)[1]=((y)[2]*(z)[0])-((y)[0]*(z)[2]);(x)[2]=((y)[0]*(z)[1])-((y)[1]*(z)[0]);}
+static inline void MD_VectorCopy(mdf *x,mdf *y) {(x)[0]=(y)[0];(x)[1]=(y)[1];(x)[2]=(y)[2];}
+static inline void MD_VectorNormalize(mdf *x) {mdf _f;_f=1.0/sqrt((x)[0]*(x)[0]+(x)[1]*(x)[1]+(x)[2]*(x)[2]);(x)[0]*=_f;(x)[1]*=_f;(x)[2]*=_f;}
+static inline void MD_VectorZero(mdf *x) {(x)[0]=0.0;(x)[1]=0.0;(x)[2]=0.0;}
+#endif
 
 
 ////
@@ -4362,7 +4379,7 @@ static void mdMeshInitVertices( mdMesh *mesh, mdThreadData *tdata, int threadcou
     mtSpinInit( &vertex->ownerspinlock );
 #endif
     mesh->vertexUserToNative( vertex->point, point, factor );
-#if CPU_SSE_SUPPORT
+#if CPU_SSE_SUPPORT && !MD_CONF_DOUBLE_PRECISION
     vertex->point[3] = 0.0;
 #endif
     vertex->trirefcount = 0;
