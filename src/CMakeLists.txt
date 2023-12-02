@@ -5,8 +5,9 @@ include_directories(
 set(MMESH_SOURCES
   cc.c
   meshdecimation.c
-  mmbinsort.c
+  meshoptimizer.c
   mm.c
+  mmbinsort.c
   mmcore.c
   mmhash.c
   )

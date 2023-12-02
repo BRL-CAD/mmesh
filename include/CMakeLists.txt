@@ -1,5 +1,6 @@
 set(mmesh_hdrs
   meshdecimation.h
+  meshoptimizer.h
   )
 install(FILES ${mmesh_hdrs} DESTINATION ${INCLUDE_DIR}/mmesh)
 
