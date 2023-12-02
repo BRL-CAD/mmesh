@@ -57,10 +57,10 @@
 
 
 
-#if MO_DEBUG
+#if MO_DEBUG && !defined(_MSC_VER)
  #define MO_ERROR(s,f,...) ({fprintf(stderr,s,__VA_ARGS__);if(f) exit(1);})
 #else
- #define MO_ERROR(s,f,...) ({fprintf(stderr,s,__VA_ARGS__);})
+ #define MO_ERROR(s,f,...) fprintf(stderr,s,__VA_ARGS__)
 #endif
 
 
