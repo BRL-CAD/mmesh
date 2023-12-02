@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "mm.h"
 #include "mmthread.h"
 
 
