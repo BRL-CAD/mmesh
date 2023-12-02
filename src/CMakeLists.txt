@@ -10,6 +10,7 @@ set(MMESH_SOURCES
   mmbinsort.c
   mmcore.c
   mmhash.c
+  mmthread.c
   )
 
 add_library(mmesh SHARED ${MMESH_SOURCES})
