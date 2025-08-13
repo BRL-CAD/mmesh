@@ -38,7 +38,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 # Set CMake project name
-project(MMESH)
+project(mmesh VERSION 1.0.0 LANGUAGES C)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
