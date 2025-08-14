@@ -29,22 +29,28 @@ if (BUILD_SHARED_LIBS)
 endif (BUILD_SHARED_LIBS)
 
 if (BUILD_STATIC_LIBS)
-  add_library(mmesh-static STATIC ${MMESH_SOURCES})
+
+  set(mmesh_static_name mmesh)
+  if (BUILD_SHARED_LIBS)
+    set(mmesh_static_name mmesh-static)
+  endif (BUILD_SHARED_LIBS)
+
+  add_library(${mmesh_static_name} STATIC ${MMESH_SOURCES})
   if(MSVC)
     # msvc does not append 'lib' - do it here to have consistent name
-    set_target_properties(mmesh-static PROPERTIES PREFIX "lib")
+    set_target_properties(${mmesh_static_name} PROPERTIES PREFIX "lib")
   else(MSVC)
-    set_target_properties(mmesh-static PROPERTIES OUTPUT_NAME "mmesh")
+    set_target_properties(${mmesh_static_name} PROPERTIES OUTPUT_NAME "mmesh")
   endif(MSVC)
   target_include_directories(
-    mmesh-static PUBLIC
+    ${mmesh_static_name} PUBLIC
     $<INSTALL_INTERFACE:${INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
   )
-  target_link_libraries(mmesh-static PRIVATE ${MM_LIBS})
-  set_property(TARGET mmesh-static APPEND PROPERTY COMPILE_DEFINITIONS "MMESH_DLL_EXPORTS")
-  set_property(TARGET mmesh-static APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS "MMESH_DLL_IMPORTS")
-  install(TARGETS mmesh-static
+  target_link_libraries(${mmesh_static_name} PRIVATE ${MM_LIBS})
+  set_property(TARGET ${mmesh_static_name} APPEND PROPERTY COMPILE_DEFINITIONS "MMESH_DLL_EXPORTS")
+  set_property(TARGET ${mmesh_static_name} APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS "MMESH_DLL_IMPORTS")
+  install(TARGETS ${mmesh_static_name}
     EXPORT mmeshTargets
     RUNTIME DESTINATION ${BIN_DIR}
     LIBRARY DESTINATION ${LIB_DIR}
