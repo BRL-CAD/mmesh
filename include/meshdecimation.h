@@ -150,9 +150,9 @@ typedef struct
 
 
 
-  /* Stop decimating at/below this count of vertices ~ set zero to disable */
+  /* Stop decimating at/below this count of vertices.  Set zero to disable */
   size_t targetvertexcountmin;
-  /* Continue decimating while vertexcount > targetvertexcountmax ~ set zero to disable */
+  /* Continue decimating while vertexcount > targetvertexcountmax.  Set zero to disable */
   size_t targetvertexcountmax;
 
   /* To compute vertex normals */
