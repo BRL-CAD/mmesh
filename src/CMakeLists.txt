@@ -9,22 +9,49 @@ set(MMESH_SOURCES
   mmthread.c
 )
 
-add_library(mmesh SHARED ${MMESH_SOURCES})
-target_include_directories(
-  mmesh PUBLIC
-  $<INSTALL_INTERFACE:${INCLUDE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-)
-target_link_libraries(mmesh PRIVATE ${MM_LIBS})
-set_property(TARGET mmesh APPEND PROPERTY COMPILE_DEFINITIONS "MMESH_DLL_EXPORTS")
-set_property(TARGET mmesh APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS "MMESH_DLL_IMPORTS")
-install(TARGETS mmesh
-  EXPORT mmeshTargets
-  RUNTIME DESTINATION ${BIN_DIR}
-  LIBRARY DESTINATION ${LIB_DIR}
-  ARCHIVE DESTINATION ${LIB_DIR}
-  INCLUDES DESTINATION ${INCLUDE_DIR}
-)
+if (BUILD_SHARED_LIBS)
+  add_library(mmesh SHARED ${MMESH_SOURCES})
+  target_include_directories(
+    mmesh PUBLIC
+    $<INSTALL_INTERFACE:${INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+  )
+  target_link_libraries(mmesh PRIVATE ${MM_LIBS})
+  set_property(TARGET mmesh APPEND PROPERTY COMPILE_DEFINITIONS "MMESH_DLL_EXPORTS")
+  set_property(TARGET mmesh APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS "MMESH_DLL_IMPORTS")
+  install(TARGETS mmesh
+    EXPORT mmeshTargets
+    RUNTIME DESTINATION ${BIN_DIR}
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    INCLUDES DESTINATION ${INCLUDE_DIR}
+  )
+endif (BUILD_SHARED_LIBS)
+
+if (BUILD_STATIC_LIBS)
+  add_library(mmesh-static STATIC ${MMESH_SOURCES})
+  if(MSVC)
+    # msvc does not append 'lib' - do it here to have consistent name
+    set_target_properties(mmesh-static PROPERTIES PREFIX "lib")
+  else(MSVC)
+    set_target_properties(mmesh-static PROPERTIES OUTPUT_NAME "mmesh")
+  endif(MSVC)
+  target_include_directories(
+    mmesh-static PUBLIC
+    $<INSTALL_INTERFACE:${INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+  )
+  target_link_libraries(mmesh-static PRIVATE ${MM_LIBS})
+  set_property(TARGET mmesh-static APPEND PROPERTY COMPILE_DEFINITIONS "MMESH_DLL_EXPORTS")
+  set_property(TARGET mmesh-static APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS "MMESH_DLL_IMPORTS")
+  install(TARGETS mmesh-static
+    EXPORT mmeshTargets
+    RUNTIME DESTINATION ${BIN_DIR}
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    INCLUDES DESTINATION ${INCLUDE_DIR}
+  )
+endif (BUILD_STATIC_LIBS)
 
 # Export the targets to a file
 install(EXPORT mmeshTargets

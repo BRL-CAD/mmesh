@@ -40,9 +40,7 @@ cmake_minimum_required(VERSION 3.18)
 # Set CMake project name
 project(mmesh VERSION 1.0.0 LANGUAGES C)
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  )
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if (NOT DEFINED BIN_DIR)
   set (BIN_DIR bin)
@@ -55,6 +53,14 @@ endif (NOT DEFINED LIB_DIR)
 if (NOT DEFINED INCLUDE_DIR)
   set (INCLUDE_DIR include)
 endif (NOT DEFINED INCLUDE_DIR)
+
+if (NOT DEFINED BUILD_SHARED_LIBS)
+  set(BUILD_SHARED_LIBS ON)
+endif (NOT DEFINED BUILD_SHARED_LIBS)
+
+if (NOT DEFINED BUILD_STATIC_LIBS)
+  set(BUILD_STATIC_LIBS ON)
+endif (NOT DEFINED BUILD_STATIC_LIBS)
 
 find_package(Threads REQUIRED)
 
