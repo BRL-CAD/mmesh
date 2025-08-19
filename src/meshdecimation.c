@@ -163,14 +163,14 @@
 
 
 #if 1
- #define DEBUG_VERBOSE_WORK (1)
+ #define DEBUG_VERBOSE_WORK (0)
  #define DEBUG_VERBOSE_QUADRIC (0)
  #define DEBUG_VERBOSE_BOUNDARY (0)
  #define DEBUG_VERBOSE_TOPOLOGY (0)
  #define DEBUG_VERBOSE_COLLISION (0)
  #define DEBUG_VERBOSE_COST (0)
  #define DEBUG_VERBOSE_COLLAPSE (0)
- #define DEBUG_VERBOSE_MEMORY (0+1)
+ #define DEBUG_VERBOSE_MEMORY (0)
  #define DEBUG_VERBOSE_OUTPUT (0)
  #define DEBUG_VERBOSE_CHECKS (0)
 #elif 0
@@ -4933,7 +4933,7 @@ static int mdMeshProcessQueue( mdMesh *mesh, mdThreadData *tdata )
 
 #if DEBUG_VERBOSE_WORK >= 2
   printf( "Thread %d work, begin decimation, maxcollapsecost %f\n", mesh->maxcollapsecost );
-#elif DEBUG_VERBOSE_WORK
+#elif DEBUG_VERBOSE_WORK > 0
   if( tdata->threadid == 0 )
     printf( "Begin decimation, maxcollapsecost %f\n", mesh->maxcollapsecost );
 #endif
@@ -4985,7 +4985,7 @@ static int mdMeshProcessQueue( mdMesh *mesh, mdThreadData *tdata )
       maxcost = mdfMeshProcessGetStepMaxCost( mesh, stepindex );
 #if DEBUG_VERBOSE_WORK >= 2
       printf( "Thread %d work, begin step %d, maxcost %e\n", tdata->threadid, stepindex, maxcost );
-#elif DEBUG_VERBOSE_WORK
+#elif DEBUG_VERBOSE_WORK > 0
       if( tdata->threadid == 0 )
         printf( "Decimation, begin step %d, maxcost %e\n", stepindex, maxcost );
 #endif
